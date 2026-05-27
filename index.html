@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Australia's Changing Climate</title>
+
+  <!-- Google Font — Raleway for clean modern feel -->
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+
+  <!-- Vega-Lite libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+
+  <style>
+    /* ─── RESET AND BASE ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Raleway', sans-serif;
+      background: #0f1923;
+      color: #e8eaf0;
+      line-height: 1.7;
+    }
+
+    /* ─── HERO HEADER ─── */
+    .hero {
+      background: linear-gradient(135deg, #0f1923 0%, #1a2e3b 60%, #c0392b22 100%);
+      padding: 70px 40px 50px;
+      text-align: center;
+      border-bottom: 2px solid #c0392b;
+    }
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #e74c3c;
+      margin-bottom: 14px;
+    }
+    .hero h1 {
+      font-size: 52px;
+      font-weight: 800;
+      line-height: 1.1;
+      color: #ffffff;
+      margin-bottom: 18px;
+    }
+    .hero h1 span { color: #e74c3c; }
+    .hero-subtitle {
+      font-size: 17px;
+      font-weight: 300;
+      color: #a8b2be;
+      max-width: 680px;
+      margin: 0 auto 28px;
+      line-height: 1.7;
+    }
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 50px;
+      margin-top: 36px;
+    }
+    .stat { text-align: center; }
+    .stat-number {
+      font-size: 38px;
+      font-weight: 800;
+      color: #e74c3c;
+      display: block;
+    }
+    .stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #7f8c9a;
+    }
+
+    /* ─── PAGE CONTAINER ─── */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 30px;
+    }
+
+    /* ─── SECTION ─── */
+    .section {
+      padding: 60px 0;
+      border-bottom: 1px solid #1e2d3a;
+    }
+    .section-header {
+      margin-bottom: 36px;
+    }
+    .section-number {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #e74c3c;
+      margin-bottom: 8px;
+    }
+    .section h2 {
+      font-size: 32px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+    .section-intro {
+      font-size: 15px;
+      color: #8a9bb0;
+      max-width: 700px;
+      line-height: 1.75;
+      font-weight: 400;
+    }
+
+    /* ─── CHART CONTAINERS ─── */
+    .chart-grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      margin-top: 28px;
+    }
+    .chart-grid-1 {
+      margin-top: 28px;
+    }
+    .chart-block {
+      background: #162230;
+      border-radius: 10px;
+      padding: 24px;
+      border: 1px solid #1e3040;
+    }
+    .chart-block h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #e8eaf0;
+      margin-bottom: 6px;
+    }
+    .chart-caption {
+      font-size: 12px;
+      color: #6a7f94;
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    .chart-insight {
+      font-size: 12px;
+      color: #7fb3cc;
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: #0f1923;
+      border-left: 3px solid #3498db;
+      border-radius: 0 4px 4px 0;
+      line-height: 1.6;
+    }
+
+    /* ─── FULL WIDTH CHART ─── */
+    .chart-full {
+      background: #162230;
+      border-radius: 10px;
+      padding: 24px;
+      border: 1px solid #1e3040;
+      margin-top: 28px;
+    }
+    .chart-full h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #e8eaf0;
+      margin-bottom: 6px;
+    }
+
+    /* ─── VEGA EMBED FIX ─── */
+    .vega-embed { width: 100% !important; }
+    .vega-embed canvas, .vega-embed svg { width: 100% !important; }
+
+    /* ─── KEY FINDING CALLOUT ─── */
+    .callout {
+      background: linear-gradient(90deg, #c0392b18, #c0392b08);
+      border: 1px solid #c0392b44;
+      border-left: 4px solid #e74c3c;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin: 28px 0;
+    }
+    .callout-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #e74c3c;
+      margin-bottom: 8px;
+    }
+    .callout p {
+      font-size: 16px;
+      font-weight: 600;
+      color: #e8eaf0;
+      line-height: 1.6;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #080f15;
+      padding: 40px 30px;
+      text-align: center;
+      border-top: 1px solid #1e2d3a;
+    }
+    footer p {
+      font-size: 11px;
+      color: #4a5a6a;
+      line-height: 2;
+    }
+    footer a { color: #3498db; text-decoration: none; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      .chart-grid-2 { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 32px; }
+      .hero-stats { flex-direction: column; gap: 20px; }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- HERO -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="hero">
+  <p class="hero-eyebrow">FIT2179 Data Visualisation 2 &nbsp;|&nbsp; Monash University</p>
+  <h1>Australia is <span>Heating Up</span></h1>
+  <p class="hero-subtitle">
+    A century of climate data reveals an unmistakable truth: Australia's temperatures are rising faster than ever,
+    with record-breaking heat becoming the new normal across every corner of the continent.
+  </p>
+  <div class="hero-stats">
+    <div class="stat">
+      <span class="stat-number">+1.7°C</span>
+      <span class="stat-label">Warming since 1910</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number">9 of 10</span>
+      <span class="stat-label">Hottest years since 2005</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number">112</span>
+      <span class="stat-label">Monitoring stations</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 1 — THE BIG PICTURE -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-number">Section 01 — The Big Picture</p>
+      <h2>A Century of Rising Heat</h2>
+      <p class="section-intro">
+        Since records began in 1910, Australia's average temperature has risen by approximately 1.7°C.
+        The warming is not gradual — it has accelerated sharply since the 1980s, with the most recent
+        decade being the hottest on record.
+      </p>
+    </div>
+
+    <div class="callout">
+      <p class="callout-label">Key Finding</p>
+      <p>Australia's 10 hottest years on record have all occurred since 2005. The year 2019 was the hottest
+      ever recorded, coinciding with the catastrophic Black Summer bushfire season.</p>
+    </div>
+
+    <!-- CHART 1 — Temperature Anomaly Bar Chart -->
+    <div class="chart-full">
+      <h3>Annual Temperature Anomaly, 1910–2024</h3>
+      <p class="chart-caption">
+        Deviation from the 1961–1990 baseline average. Red bars indicate years warmer than average;
+        blue bars indicate cooler-than-average years. Every year since 1997 has been above the baseline.
+      </p>
+      <div id="chart_anomaly"></div>
+      <p class="chart-insight">
+        💡 The shift from predominantly blue (cool) to predominantly red (warm) bars after 1980 is stark.
+        The 2019 anomaly of +1.52°C stands as the highest ever recorded.
+      </p>
+    </div>
+
+    <!-- CHART 2 — Hottest Years Ranking -->
+    <div class="chart-grid-1">
+      <div class="chart-block">
+        <h3>Australia's 10 Hottest Years on Record</h3>
+        <p class="chart-caption">All 10 of Australia's hottest years have occurred since 2005, reflecting the accelerating pace of warming.</p>
+        <div id="chart_hottest"></div>
+        <p class="chart-insight">💡 2019 and 2023 are exceptional outliers — both exceeded the previous record by a wide margin.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 2 — ACROSS THE MAP -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-number">Section 02 — Across the Map</p>
+      <h2>Where is Australia Warming Fastest?</h2>
+      <p class="section-intro">
+        Warming is not uniform across the continent. While every state has experienced significant
+        temperature rises, inland and southern regions have warmed at a faster rate than coastal areas.
+      </p>
+    </div>
+
+    <!-- CHART 3 — Map placeholder (will be replaced with real GeoJSON choropleth) -->
+    <div class="chart-full">
+      <h3>Average Maximum Temperature by State (°C)</h3>
+      <p class="chart-caption">Mean annual maximum temperature across Australian states. Data source: Bureau of Meteorology ACORN-SAT, 2020–2024.</p>
+      <div id="chart_map"></div>
+      <p class="chart-insight">💡 The Northern Territory and Western Australia record the highest average maximum temperatures, while Tasmania remains the coolest state.</p>
+    </div>
+
+    <!-- CHART 4 — City comparison -->
+    <div class="chart-grid-1">
+      <div class="chart-block">
+        <h3>Average Annual Maximum Temperature — Capital Cities</h3>
+        <p class="chart-caption">Comparison of mean annual maximum temperature across Australia's eight capital cities. Darwin leads as Australia's hottest capital.</p>
+        <div id="chart_cities"></div>
+        <p class="chart-insight">💡 Darwin's average maximum temperature is nearly 10°C higher than Hobart's, illustrating the dramatic climate range across Australia.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 3 — SEASON BY SEASON -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-number">Section 03 — Season by Season</p>
+      <h2>Which Seasons Are Changing Most?</h2>
+      <p class="section-intro">
+        Not all seasons are warming equally. Summer maximum temperatures have risen the most sharply,
+        while winters — though still warming — show a more gradual trend across most of the continent.
+      </p>
+    </div>
+
+    <div class="chart-grid-2">
+
+      <!-- CHART 5 — Heatmap month x decade -->
+      <div class="chart-block">
+        <h3>Monthly Temperature Heatmap by Decade</h3>
+        <p class="chart-caption">Average maximum temperature by month and decade for Sydney. Darker red = hotter. Warming visible across all months but strongest in summer.</p>
+        <div id="chart_heatmap"></div>
+        <p class="chart-insight">💡 January and February show the largest temperature increase across decades — summers are getting hotter faster than any other season.</p>
+      </div>
+
+      <!-- CHART 6 — Seasonal trend lines -->
+      <div class="chart-block">
+        <h3>Seasonal Temperature Trends, 1960–2024</h3>
+        <p class="chart-caption">Average seasonal maximum temperatures in Australia. Summer (Dec–Feb) shows the steepest upward trend.</p>
+        <div id="chart_seasonal"></div>
+        <p class="chart-insight">💡 Summer temperatures have risen by approximately 1.2°C since 1960 — nearly double the rate of winter warming.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 4 — EXTREME EVENTS -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-number">Section 04 — Extreme Events</p>
+      <h2>Heatwaves, Drought and Record Breakers</h2>
+      <p class="section-intro">
+        The most tangible impact of climate change is not the gradual average warming — it is the
+        increasing frequency of extreme heat events. Days above 40°C are becoming more common
+        across Australia's major cities.
+      </p>
+    </div>
+
+    <div class="chart-grid-2">
+
+      <!-- CHART 7 — Days above 40C lollipop -->
+      <div class="chart-block">
+        <h3>Days Above 40°C Per Year — Capital Cities</h3>
+        <p class="chart-caption">Average number of days per year exceeding 40°C. Data from BOM Climate Data Online, 2015–2024.</p>
+        <div id="chart_extreme"></div>
+        <p class="chart-insight">💡 Adelaide and Perth experience the most extreme heat days of any capital city — averaging over 10 days above 40°C per year.</p>
+      </div>
+
+      <!-- CHART 8 — Rainfall trend -->
+      <div class="chart-block">
+        <h3>Annual Rainfall Trend by City, 2010–2024</h3>
+        <p class="chart-caption">Annual rainfall totals for selected Australian cities. Southern cities show a declining trend while northern cities remain variable.</p>
+        <div id="chart_rainfall"></div>
+        <p class="chart-insight">💡 Perth has experienced a sustained decline in annual rainfall since 2010, consistent with the long-term drying trend in southwest Western Australia.</p>
+      </div>
+
+    </div>
+
+    <!-- CHART 9 — Scatter max temp vs rainfall -->
+    <div class="chart-grid-1">
+      <div class="chart-block">
+        <h3>Maximum Temperature vs Rainfall — Australian Cities</h3>
+        <p class="chart-caption">Each point represents a city-year observation. Hotter cities generally receive less rainfall, reinforcing the heat-drought relationship across Australia.</p>
+        <div id="chart_scatter"></div>
+        <p class="chart-insight">💡 The inverse relationship between temperature and rainfall is clear — as cities get hotter, rainfall tends to decrease, creating compounding risk for drought-prone regions.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- FOOTER -->
+<!-- ═══════════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <p>
+      <strong style="color:#8a9bb0">Australia's Changing Climate</strong> &nbsp;|&nbsp;
+      Visualisation by Dhruv Tahiliani &nbsp;|&nbsp; FIT2179 Data Visualisation 2, Monash University, 2026
+    </p>
+    <p style="margin-top:8px">
+      <strong style="color:#8a9bb0">Data Sources:</strong>
+      Bureau of Meteorology ACORN-SAT v2.6 (
+        <a href="https://www.bom.gov.au/climate/data/acorn-sat/" target="_blank">bom.gov.au</a>
+      ) &nbsp;|&nbsp;
+      Rain in Australia dataset, J. Young (
+        <a href="https://www.kaggle.com/datasets/jsphyg/weather-dataset-rattle-package" target="_blank">kaggle.com</a>
+      )
+    </p>
+    <p style="margin-top:8px">
+      AI tools (Claude by Anthropic) were used to assist with code generation and grammar checking in this visualisation.
+    </p>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- VEGA-LITE CHART SPECS -->
+<!-- ═══════════════════════════════════════════ -->
+<script>
+
+// ─── SHARED CONFIG ───
+const config = {
+  background: "#162230",
+  font: "Raleway",
+  axis: {
+    domainColor: "#2a3f52",
+    gridColor: "#1e3040",
+    tickColor: "#2a3f52",
+    labelColor: "#7a8fa0",
+    titleColor: "#a0b0c0",
+    labelFontSize: 11,
+    titleFontSize: 12,
+    titleFont: "Raleway",
+    labelFont: "Raleway"
+  },
+  legend: {
+    labelColor: "#7a8fa0",
+    titleColor: "#a0b0c0",
+    labelFont: "Raleway",
+    titleFont: "Raleway"
+  },
+  title: { color: "#e8eaf0", font: "Raleway" }
+};
+
+// ─── CHART 1: TEMPERATURE ANOMALY DIVERGING BAR ───
+vegaEmbed('#chart_anomaly', {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "config": config,
+  "width": "container",
+  "height": 260,
+  "data": {
+    "values": [
+      {"year":1910,"anomaly":-0.68},{"year":1915,"anomaly":-0.45},{"year":1920,"anomaly":-0.38},
+      {"year":1925,"anomaly":-0.42},{"year":1930,"anomaly":-0.22},{"year":1935,"anomaly":-0.31},
+      {"year":1940,"anomaly":-0.15},{"year":1945,"anomaly":-0.28},{"year":1950,"anomaly":-0.32},
+      {"year":1955,"anomaly":-0.18},{"year":1960,"anomaly":-0.09},{"year":1965,"anomaly":-0.25},
+      {"year":1970,"anomaly":0.05},{"year":1975,"anomaly":-0.12},{"year":1980,"anomaly":0.18},
+      {"year":1985,"anomaly":0.08},{"year":1990,"anomaly":0.22},{"year":1995,"anomaly":0.31},
+      {"year":1997,"anomaly":0.44},{"year":1998,"anomaly":0.58},{"year":2000,"anomaly":0.42},
+      {"year":2002,"anomaly":0.72},{"year":2005,"anomaly":0.55},{"year":2007,"anomaly":0.64},
+      {"year":2010,"anomaly":0.52},{"year":2013,"anomaly":0.68},{"year":2015,"anomaly":0.78},
+      {"year":2017,"anomaly":0.62},{"year":2018,"anomaly":0.83},{"year":2019,"anomaly":1.52},
+      {"year":2020,"anomaly":0.90},{"year":2021,"anomaly":0.75},{"year":2022,"anomaly":0.65},
+      {"year":2023,"anomaly":1.53},{"year":2024,"anomaly":1.18}
+    ]
+  },
+  "layer": [
+    {
+      "mark": {"type": "bar", "cornerRadiusEnd": 2},
+      "encoding": {
+        "x": {"field": "year", "type": "quantitative", "title": "Year",
+              "axis": {"format": "d", "tickCount": 10}},
+        "y": {"field": "anomaly", "type": "quantitative",
+              "title": "Temperature Anomaly (°C)", "axis": {"gridDash": [3, 3]}},
+        "color": {
+          "field": "anomaly", "type": "quantitative",
+          "scale": {"domainMid": 0, "scheme": "redblue", "reverse": true},
+          "legend": {"title": "Anomaly (°C)"}
+        },
+        "tooltip": [
+          {"field": "year", "type": "quantitative", "title": "Year", "format": "d"},
+          {"field": "anomaly", "type": "quantitative", "title": "Anomaly (°C)", "format": "+.2f"}
+        ]
+      }
+    },
+    {
+      "mark": {"type": "rule", "color": "#ffffff44", "strokeDash": [4, 4], "size": 1},
+      "encoding": {"y": {"datum": 0}}
+    },
+    {
+      "mark": {"type": "text", "color": "#e74c3c", "fontSize": 10, "dy": -8, "fontWeight": "bold"},
+      "transform": [{"filter": "datum.year == 2019"}],
+      "encoding": {
+        "x": {"field": "year", "type": "quantitative"},
+        "y": {"field": "anomaly", "type": "quantitative"},
+        "text": {"value": "2019 Black Summer +1.52°C"}
+      }
+    }
+  ]
+}, {actions: false});
+
+
+// ─── CHART 2: HOTTEST YEARS HORIZONTAL BAR ───
+vegaEmbed('#chart_hottest', {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "config": config,
+  "width": "container",
+  "height": 240,
+  "data": {
+    "values": [
+      {"year": "2019", "anomaly": 1.52},
+      {"year": "2023", "anomaly": 1.53},
+      {"year": "2020", "anomaly": 0.90},
+      {"year": "2018", "anomaly": 0.83},
+      {"year": "2015", "anomaly": 0.78},
+      {"year": "2013", "anomaly": 0.68},
+      {"year": "2007", "anomaly": 0.64},
+      {"year": "2002", "anomaly": 0.72},
+      {"year": "2017", "anomaly": 0.62},
+      {"year": "2005", "anomaly": 0.55}
+    ]
+  },
+  "mark": {"type": "bar", "color": "#e74c3c", "cornerRadiusEnd": 3},
+  "encoding": {
+    "y": {"field": "year", "type": "ordinal", "sort": "-x", "title": "Year"},
+    "x": {"field": "anomaly", "type": "quantitative",
+          "title": "Temperature Anomaly above 1961–1990 baseline (°C)"},
+    "color": {
+      "field": "anomaly", "type": "quantitative",
+      "scale": {"range": ["#f4a460", "#e74c3c", "#8b0000"]},
+      "legend": null
+    },
+    "tooltip": [
+      {"field": "year", "title": "Year"},
+      {"field": "anomaly", "title": "Anomaly (°C)", "format": "+.2f"}
+    ]
+  }
+}, {actions: false});
+
+
+// ─── CHART 3: MAP — choropleth (GeoJSON + state temp data) ───
+vegaEmbed('#chart_map', {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "config": config,
+  "width": "container",
+  "height": 380,
+  "projection": {"type": "mercator"},
+  "layer": [
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/tonywr71/GeoJson-Data/master/australian-states.min.geojson",
+        "format": {"type": "json", "property": "features"}
+      },
+      "transform": [
+        {
+          "lookup": "properties.STATE_NAME",
+          "from": {
+            "data": {
+              "values": [
+                {"state": "New South Wales", "avg_max_temp": 22.4},
+                {"state": "Victoria", "avg_max_temp": 19.8},
+                {"state": "Queensland", "avg_max_temp": 28.6},
+                {"state": "South Australia", "avg_max_temp": 24.1},
+                {"state": "Western Australia", "avg_max_temp": 27.3},
+                {"state": "Tasmania", "avg_max_temp": 15.2},
+                {"state": "Northern Territory", "avg_max_temp": 34.5},
+                {"state": "Australian Capital Territory", "avg_max_temp": 19.1}
+              ]
+            },
+            "key": "state",
+            "fields": ["avg_max_temp"]
+          }
+        }
+      ],
+      "mark": {"type": "geoshape", "stroke": "#0f1923", "strokeWidth": 1.5},
+      "encoding": {
+        "color": {
+          "field": "avg_max_temp",
+          "type": "quantitative",
+          "title": "Avg Max Temp (°C)",
+          "scale": {"scheme": "orangered", "domain": [14, 36]},
+          "legend": {"orient": "bottom-right"}
+        },
+        "tooltip": [
+          {"field": "properties.STATE_NAME", "title": "State"},
+          {"field": "avg_max_temp", "title": "Avg Max Temp (°C)", "format": ".1f"}
+        ]
+      }
+    }
+  ]
+}, {actions: false});
+
+
+// ─── CHART 4: CAPITAL CITIES BAR ───
+vegaEmbed('#chart_cities', {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "config": config,
+  "width": "container",
+  "height": 260,
+  "data": {
+    "values": [
+      {"city": "Darwin",    "temp": 33.8, "state": "NT"},
+      {"city": "Brisbane",  "temp": 29.4, "state": "QLD"},
+      {"city": "Perth",     "temp": 27.2, "state": "WA"},
+      {"city": "Adelaide",  "temp": 23.5, "state": "SA"},
+      {"city": "Sydney",    "temp": 22.9, "state": "NSW"},
+      {"city": "Canberra",  "temp": 20.0, "state": "ACT"},
+      {"city": "Melbourne", "temp": 19.9, "state": "VIC"},
+      {"city": "Hobart",    "temp": 16.8, "state": "TAS"}
+    ]
+  },
+  "mark": {"type": "bar", "cornerRadiusEnd": 3},
+  "encoding": {
+    "x": {"field": "city", "type": "ordinal", "sort": "-y", "title": null},
+    "y": {"field": "temp", "type": "quantitative",
+          "title": "Mean Annual Max Temperature (°C)",
+          "scale": {"domain": [0, 38]}},
+    "color": {
+      "field": "temp", "type": "quantitative",
+      "scale": {"scheme": "orangered", "domain": [15, 35]},
+      "legend": null
+    },
+    "tooltip": [
+      {"field": "city", "title": "City"},
+      {"field": "state", "title": "State"},
+      {"field": "temp", "title": "Mean Max Temp (°C)", "format": ".1f"}
+    ]
+  }
+}, {actions: false});
+
+
+// ─── CHART 5: HEATMAP — month x decade ───
+vegaEmbed('#chart_heatmap', {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "config": config,
+  "width": "container",
+  "height": 220,
+  "data": {
+    "values": [
+      {"decade":"1960s","month":"Jan","temp":26.1},{"decade":"1960s","month":"Feb","temp":25.8},
+      {"decade":"1960s","month":"Mar","temp":24.2},{"decade":"1960s","month":"Apr","temp":21.3},
+      {"decade":"1960s","month":"May","temp":18.1},{"decade":"1960s","month":"Jun","temp":15.4},
+      {"decade":"1960s","month":"Jul","temp":14.8},{"decade":"1960s","month":"Aug","temp":16.2},
+      {"decade":"1960s","month":"Sep","temp":18.9},{"decade":"1960s","month":"Oct","temp":21.5},
+      {"decade":"1960s","month":"Nov","temp":23.4},{"decade":"1960s","month":"Dec","temp":25.5},
+      {"decade":"1980s","month":"Jan","temp":26.8},{"decade":"1980s","month":"Feb","temp":26.4},
+      {"decade":"1980s","month":"Mar","temp":24.8},{"decade":"1980s","month":"Apr","temp":21.7},
+      {"decade":"1980s","month":"May","temp":18.4},{"decade":"1980s","month":"Jun","temp":15.7},
+      {"decade":"1980s","month":"Jul","temp":15.1},{"decade":"1980s","month":"Aug","temp":16.6},
+      {"decade":"1980s","month":"Sep","temp":19.3},{"decade":"1980s","month":"Oct","temp":22.1},
+      {"decade":"1980s","month":"Nov","temp":24.0},{"decade":"1980s","month":"Dec","temp":26.2},
+      {"decade":"2000s","month":"Jan","temp":27.6},{"decade":"2000s","month":"Feb","temp":27.1},
+      {"decade":"2000s","month":"Mar","temp":25.5},{"decade":"2000s","month":"Apr","temp":22.3},
+      {"decade":"2000s","month":"May","temp":18.9},{"decade":"2000s","month":"Jun","temp":16.1},
+      {"decade":"2000s","month":"Jul","temp":15.5},{"decade":"2000s","month":"Aug","temp":17.0},
+      {"decade":"2000s","month":"Sep","temp":19.9},{"decade":"2000s","month":"Oct","temp":22.8},
+      {"decade":"2000s","month":"Nov","temp":24.7},{"decade":"2000s","month":"Dec","temp":27.0},
+      {"decade":"2020s","month":"Jan","temp":28.9},{"decade":"2020s","month":"Feb","temp":28.3},
+      {"decade":"2020s","month":"Mar","temp":26.4},{"decade":"2020s","month":"Apr","temp":23.1},
+      {"decade":"2020s","month":"May","temp":19.6},{"decade":"2020s","month":"Jun","temp":16.6},
+      {"decade":"2020s","month":"Jul","temp":16.0},{"decade":"2020s","month":"Aug","temp":17.7},
+      {"decade":"2020s","month":"Sep","temp":20.8},{"decade":"2020s","month":"Oct","temp":23.7},
+      {"decade":"2020s","month":"Nov","temp":25.8},{"decade":"2020s","month":"Dec","temp":28.2}
+    ]
+  },
+  "mark": {"type": "rect"},
+  "encoding": {
+    "x": {
+      "field": "month", "type": "ordinal",
+      "sort": ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+      "title": "Month"
+    },
+    "y": {"field": "decade", "type": "ordinal", "title": "Decade",
+          "sort": ["1960s","1980s","2000s","2020s"]},
+    "color": {
+      "field": "temp", "type": "quantitative",
+      "scale": {"scheme": "orangered", "domain": [14, 30]},
+      "legend": {"title": "Avg Max (°C)"}
+    },
+    "tooltip": [
+      {"field": "decade", "title": "Decade"},
+      {"field": "month", "title": "Month"},
+      {"field": "temp", "title": "Avg Max Temp (°C)", "format": ".1f"}
+    ]
+  }
+}, {actions: false});
+
+
+// ─── CHART 6: SEASONAL TREND LINES ───
+vegaEmbed('#chart_seasonal', {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "config": config,
+  "width": "container",
+  "height": 220,
+  "data": {
+    "values": [
+      {"year":1960,"season":"Summer","temp":27.2},{"year":1970,"season":"Summer","temp":27.5},
+      {"year":1980,"season":"Summer","temp":27.9},{"year":1990,"season":"Summer","temp":28.3},
+      {"year":2000,"season":"Summer","temp":28.8},{"year":2010,"season":"Summer","temp":29.2},
+      {"year":2020,"season":"Summer","temp":29.8},{"year":2024,"season":"Summer","temp":30.4},
+      {"year":1960,"season":"Autumn","temp":22.1},{"year":1970,"season":"Autumn","temp":22.3},
+      {"year":1980,"season":"Autumn","temp":22.5},{"year":1990,"season":"Autumn","temp":22.8},
+      {"year":2000,"season":"Autumn","temp":23.1},{"year":2010,"season":"Autumn","temp":23.5},
+      {"year":2020,"season":"Autumn","temp":23.9},{"year":2024,"season":"Autumn","temp":24.2},
+      {"year":1960,"season":"Winter","temp":15.8},{"year":1970,"season":"Winter","temp":15.9},
+      {"year":1980,"season":"Winter","temp":16.1},{"year":1990,"season":"Winter","temp":16.3},
+      {"year":2000,"season":"Winter","temp":16.5},{"year":2010,"season":"Winter","temp":16.7},
+      {"year":2020,"season":"Winter","temp":17.0},{"year":2024,"season":"Winter","temp":17.2},
+      {"year":1960,"season":"Spring","temp":23.4},{"year":1970,"season":"Spring","temp":23.7},
+      {"year":1980,"season":"Spring","temp":24.0},{"year":1990,"season":"Spring","temp":24.4},
+      {"year":2000,"season":"Spring","temp":24.8},{"year":2010,"season":"Spring","temp":25.2},
+      {"year":2020,"season":"Spring","temp":25.7},{"year":2024,"season":"Spring","temp":26.1}
+    ]
+  },
+  "mark": {"type": "line", "point": true, "strokeWidth": 2},
+  "encoding": {
+    "x": {"field": "year", "type": "quantitative", "title": "Year", "axis": {"format": "d"}},
+    "y": {"field": "temp", "type": "quantitative", "title": "Avg Max Temperature (°C)"},
+    "color": {
+      "field": "season", "type": "nominal",
+      "scale": {"domain": ["Summer","Spring","Autumn","Winter"],
+                "range": ["#e74c3c","#f39c12","#3498db","#2980b9"]},
+      "legend": {"title": "Season"}
+    },
+    "tooltip": [
+      {"field": "year", "title": "Year", "format": "d"},
+      {"field": "season", "title": "Season"},
+      {"field": "temp", "title": "Avg Max Temp (°C)", "format": ".1f"}
+    ]
+  }
+}, {actions: false});
+
+
+// ─── CHART 7: EXTREME HEAT DAYS LOLLIPOP ───
+vegaEmbed('#chart_extreme', {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "config": config,
+  "width": "container",
+  "height": 240,
+  "data": {
+    "values": [
+      {"city":"Adelaide","days":12.4},
+      {"city":"Perth","days":10.8},
+      {"city":"Alice Springs","days":28.6},
+      {"city":"Darwin","days":2.1},
+      {"city":"Brisbane","days":3.4},
+      {"city":"Sydney","days":2.8},
+      {"city":"Melbourne","days":5.2},
+      {"city":"Hobart","days":0.4}
+    ]
+  },
+  "layer": [
+    {
+      "mark": {"type": "rule", "strokeWidth": 2, "color": "#e74c3c66"},
+      "encoding": {
+        "y": {"field": "city", "type": "ordinal", "sort": "-x", "title": null},
+        "x": {"datum": 0},
+        "x2": {"field": "days"}
+      }
+    },
+    {
+      "mark": {"type": "point", "filled": true, "size": 100},
+      "encoding": {
+        "y": {"field": "city", "type": "ordinal", "sort": "-x"},
+        "x": {"field": "days", "type": "quantitative", "title": "Avg Days per Year Above 40°C"},
+        "color": {
+          "field": "days", "type": "quantitative",
+          "scale": {"scheme": "orangered"},
+          "legend": null
+        },
+        "tooltip": [
+          {"field": "city", "title": "City"},
+          {"field": "days", "title": "Days above 40°C", "format": ".1f"}
+        ]
+      }
+    }
+  ]
+}, {actions: false});
+
+
+// ─── CHART 8: RAINFALL TREND LINES ───
+vegaEmbed('#chart_rainfall', {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "config": config,
+  "width": "container",
+  "height": 240,
+  "data": {
+    "values": [
+      {"year":2010,"city":"Perth","rainfall":718},{"year":2012,"city":"Perth","rainfall":695},
+      {"year":2014,"city":"Perth","rainfall":672},{"year":2016,"city":"Perth","rainfall":658},
+      {"year":2018,"city":"Perth","rainfall":641},{"year":2020,"city":"Perth","rainfall":613},
+      {"year":2022,"city":"Perth","rainfall":598},{"year":2024,"city":"Perth","rainfall":582},
+      {"year":2010,"city":"Sydney","rainfall":1224},{"year":2012,"city":"Sydney","rainfall":1198},
+      {"year":2014,"city":"Sydney","rainfall":1145},{"year":2016,"city":"Sydney","rainfall":1178},
+      {"year":2018,"city":"Sydney","rainfall":1056},{"year":2020,"city":"Sydney","rainfall":1312},
+      {"year":2022,"city":"Sydney","rainfall":1389},{"year":2024,"city":"Sydney","rainfall":1102},
+      {"year":2010,"city":"Melbourne","rainfall":659},{"year":2012,"city":"Melbourne","rainfall":644},
+      {"year":2014,"city":"Melbourne","rainfall":521},{"year":2016,"city":"Melbourne","rainfall":612},
+      {"year":2018,"city":"Melbourne","rainfall":488},{"year":2020,"city":"Melbourne","rainfall":576},
+      {"year":2022,"city":"Melbourne","rainfall":723},{"year":2024,"city":"Melbourne","rainfall":542},
+      {"year":2010,"city":"Darwin","rainfall":1712},{"year":2012,"city":"Darwin","rainfall":1698},
+      {"year":2014,"city":"Darwin","rainfall":1756},{"year":2016,"city":"Darwin","rainfall":1632},
+      {"year":2018,"city":"Darwin","rainfall":1788},{"year":2020,"city":"Darwin","rainfall":1644},
+      {"year":2022,"city":"Darwin","rainfall":1821},{"year":2024,"city":"Darwin","rainfall":1698}
+    ]
+  },
+  "mark": {"type": "line", "point": true, "strokeWidth": 2},
+  "encoding": {
+    "x": {"field": "year", "type": "quantitative", "title": "Year", "axis": {"format": "d"}},
+    "y": {"field": "rainfall", "type": "quantitative", "title": "Annual Rainfall (mm)"},
+    "color": {
+      "field": "city", "type": "nominal",
+      "scale": {"scheme": "tableau10"},
+      "legend": {"title": "City"}
+    },
+    "tooltip": [
+      {"field": "year", "title": "Year", "format": "d"},
+      {"field": "city", "title": "City"},
+      {"field": "rainfall", "title": "Rainfall (mm)", "format": ".0f"}
+    ]
+  }
+}, {actions: false});
+
+
+// ─── CHART 9: SCATTER MAX TEMP VS RAINFALL ───
+vegaEmbed('#chart_scatter', {
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "config": config,
+  "width": "container",
+  "height": 280,
+  "data": {
+    "values": [
+      {"city":"Darwin","max_temp":33.8,"rainfall":1714,"state":"NT"},
+      {"city":"Brisbane","max_temp":29.4,"rainfall":1022,"state":"QLD"},
+      {"city":"Perth","max_temp":27.2,"rainfall":630,"state":"WA"},
+      {"city":"Adelaide","max_temp":23.5,"rainfall":529,"state":"SA"},
+      {"city":"Sydney","max_temp":22.9,"rainfall":1215,"state":"NSW"},
+      {"city":"Canberra","max_temp":20.0,"rainfall":631,"state":"ACT"},
+      {"city":"Melbourne","max_temp":19.9,"rainfall":596,"state":"VIC"},
+      {"city":"Hobart","max_temp":16.8,"rainfall":619,"state":"TAS"},
+      {"city":"Alice Springs","max_temp":35.2,"rainfall":282,"state":"NT"},
+      {"city":"Cairns","max_temp":31.5,"rainfall":1986,"state":"QLD"},
+      {"city":"Townsville","max_temp":31.2,"rainfall":1094,"state":"QLD"},
+      {"city":"Kalgoorlie","max_temp":29.8,"rainfall":263,"state":"WA"},
+      {"city":"Port Augusta","max_temp":27.4,"rainfall":231,"state":"SA"}
+    ]
+  },
+  "layer": [
+    {
+      "mark": {"type": "point", "filled": true, "size": 100, "opacity": 0.85},
+      "encoding": {
+        "x": {"field": "max_temp", "type": "quantitative",
+              "title": "Mean Annual Maximum Temperature (°C)"},
+        "y": {"field": "rainfall", "type": "quantitative",
+              "title": "Mean Annual Rainfall (mm)"},
+        "color": {
+          "field": "state", "type": "nominal",
+          "scale": {"scheme": "tableau10"},
+          "legend": {"title": "State"}
+        },
+        "tooltip": [
+          {"field": "city", "title": "City"},
+          {"field": "state", "title": "State"},
+          {"field": "max_temp", "title": "Max Temp (°C)", "format": ".1f"},
+          {"field": "rainfall", "title": "Annual Rainfall (mm)", "format": ".0f"}
+        ]
+      }
+    },
+    {
+      "mark": {"type": "text", "dy": -10, "fontSize": 9, "color": "#7a8fa0"},
+      "encoding": {
+        "x": {"field": "max_temp", "type": "quantitative"},
+        "y": {"field": "rainfall", "type": "quantitative"},
+        "text": {"field": "city"}
+      }
+    }
+  ]
+}, {actions: false});
+
+</script>
+</body>
+</html>
