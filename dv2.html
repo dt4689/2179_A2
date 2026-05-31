@@ -30,7 +30,7 @@
     .section h2{font-size:38px;font-weight:600;color:#fff;margin-bottom:14px;line-height:1.12}
     .section-intro{font-size:15px;font-weight:400;color:#5a7a94;max-width:580px;line-height:1.8}
     .chart-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px}
-    .chart-grid-wide{display:grid;grid-template-columns:2fr 1fr;gap:24px;margin-top:24px}
+    .chart-grid-wide{display:grid;grid-template-columns:3fr 2fr;gap:24px;margin-top:24px}
     .chart-grid-1{margin-top:24px}
     .chart-block{background:#111e2c;border-radius:10px;padding:22px;border:1px solid #1a3040;transition:border-color .2s}
     .chart-block:hover{border-color:#2a4060}
@@ -372,11 +372,15 @@ vegaEmbed('#chart_dotmap',{
       {"n":"Broome","lat":-17.96,"lon":122.23,"r":0.18},{"n":"Townsville","lat":-19.26,"lon":146.82,"r":0.15},
       {"n":"Geraldton","lat":-28.78,"lon":114.62,"r":0.23}
     ]},
-     "mark":{"type":"circle","opacity":0.9,"stroke":"#ffffff33","strokeWidth":0.6},
+     "params":[{"name":"stationHover","select":{"type":"point","on":"mouseover","clear":"mouseout"}}],
+     "mark":{"type":"circle","stroke":"#ffffff33","strokeWidth":0.6},
      "encoding":{
        "longitude":{"field":"lon","type":"quantitative"},"latitude":{"field":"lat","type":"quantitative"},
        "size":{"field":"r","type":"quantitative","scale":{"range":[60,800]},"legend":{"title":"Warming \u00b0C/decade"}},
        "color":{"field":"r","type":"quantitative","scale":{"scheme":"yelloworangered","domain":[0.1,0.3]},"legend":null},
+       "opacity":{"condition":{"param":"stationHover","value":1,"empty":true},"value":0.9},
+       "stroke":{"condition":{"param":"stationHover","empty":false,"value":"#ffffff"},"value":"#ffffff33"},
+       "strokeWidth":{"condition":{"param":"stationHover","empty":false,"value":2.5},"value":0.6},
        "tooltip":[{"field":"n","title":"Station"},{"field":"r","title":"Warming rate (\u00b0C/decade)","format":".2f"}]
      }}
   ]
@@ -426,12 +430,12 @@ vegaEmbed('#chart_heatmap',{
     {"d":"2000s","m":"Jan","t":27.4},{"d":"2000s","m":"Feb","t":26.8},{"d":"2000s","m":"Mar","t":25.2},{"d":"2000s","m":"Apr","t":22.0},{"d":"2000s","m":"May","t":18.6},{"d":"2000s","m":"Jun","t":15.8},{"d":"2000s","m":"Jul","t":15.2},{"d":"2000s","m":"Aug","t":16.7},{"d":"2000s","m":"Sep","t":19.6},{"d":"2000s","m":"Oct","t":22.5},{"d":"2000s","m":"Nov","t":24.4},{"d":"2000s","m":"Dec","t":26.7},
     {"d":"2020s","m":"Jan","t":28.6},{"d":"2020s","m":"Feb","t":27.9},{"d":"2020s","m":"Mar","t":26.1},{"d":"2020s","m":"Apr","t":22.8},{"d":"2020s","m":"May","t":19.3},{"d":"2020s","m":"Jun","t":16.3},{"d":"2020s","m":"Jul","t":15.7},{"d":"2020s","m":"Aug","t":17.4},{"d":"2020s","m":"Sep","t":20.5},{"d":"2020s","m":"Oct","t":23.4},{"d":"2020s","m":"Nov","t":25.5},{"d":"2020s","m":"Dec","t":27.9}
   ]},
-  "layer":[{"mark":{"type":"rect"},"encoding":{
+  "mark":{"type":"rect"},"encoding":{
     "x":{"field":"m","type":"ordinal","sort":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"title":"Month","axis":{"labelAngle":0}},
     "y":{"field":"d","type":"ordinal","sort":["1960s","1980s","2000s","2020s"],"title":"Decade"},
     "color":{"field":"t","type":"quantitative","scale":{"scheme":"yelloworangered","domain":[14,29]},"legend":{"title":"Avg Max (\u00b0C)","orient":"right"}},
     "tooltip":[{"field":"d","title":"Decade"},{"field":"m","title":"Month"},{"field":"t","title":"Avg Max Temp (\u00b0C)","format":".1f"}]
-  }},{"mark":{"type":"text","fontSize":9,"fontWeight":"bold","font":"Source Sans 3"},"transform":[{"filter":"(datum.d==='1960s'||datum.d==='2020s')&&(datum.m==='Jan'||datum.m==='Feb')"}],"encoding":{"x":{"field":"m","type":"ordinal","sort":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]},"y":{"field":"d","type":"ordinal","sort":["1960s","1980s","2000s","2020s"]},"text":{"field":"t","format":".1f"},"color":{"condition":{"test":"datum.t>24","value":"#3a1500"},"value":"#ffffff"}}}]
+  }
 },{actions:false});
 
 // CHART 6 — SEASONAL LINES
@@ -502,7 +506,7 @@ vegaEmbed('#chart_extreme',{
       "color":{"field":"days","type":"quantitative","scale":{"scheme":"yelloworangered"},"legend":null},
       "tooltip":[{"field":"city","title":"City"},{"field":"days","title":"Days above 40\u00b0C","format":".1f"}]
     }}
-  ,{"mark":{"type":"rule","color":"#ffffff25","strokeDash":[4,4],"size":1},"encoding":{"x":{"datum":10}}},{"mark":{"type":"text","color":"#ffffff55","fontSize":8.5,"angle":270,"dx":-3,"dy":-58,"font":"Source Sans 3"},"encoding":{"x":{"datum":10},"text":{"value":"10-day stress threshold"}}},{"mark":{"type":"text","color":"#d44000","fontSize":9.5,"fontWeight":"bold","dx":10,"align":"left","font":"Source Sans 3"},"transform":[{"filter":"datum.city==='Alice Springs'"}],"encoding":{"y":{"field":"city","type":"ordinal","sort":{"field":"days","order":"descending"}},"x":{"field":"days","type":"quantitative"},"text":{"value":"28.6 days/yr"}}}]
+  ,{"mark":{"type":"rule","color":"#ffffff25","strokeDash":[4,4],"size":1},"encoding":{"x":{"datum":10}}},{"mark":{"type":"text","color":"#ffffff66","fontSize":9,"align":"center","baseline":"bottom","dy":-4,"font":"Source Sans 3"},"encoding":{"x":{"datum":10},"y":{"value":0},"text":{"value":"10-day heat-stress threshold"}}},{"mark":{"type":"text","color":"#d44000","fontSize":9.5,"fontWeight":"bold","dx":10,"align":"left","font":"Source Sans 3"},"transform":[{"filter":"datum.city==='Alice Springs'"}],"encoding":{"y":{"field":"city","type":"ordinal","sort":{"field":"days","order":"descending"}},"x":{"field":"days","type":"quantitative"},"text":{"value":"28.6 days/yr"}}}]
 },{actions:false});
 
 // CHART 9 — RAINFALL LINES
