@@ -484,7 +484,7 @@ vegaEmbed('#chart_strip',{
       "color":{"field":"d","type":"ordinal","scale":{"domain":["1970s","1990s","2010s","2020s"],"range":["#2a6080","#4a8aaa","#f4a620","#d44000"]},"legend":{"title":"Decade"}},
       "tooltip":[{"field":"d","title":"Decade"},{"field":"t","title":"Max Temp (\u00b0C)","format":".1f"}]
     }},
-    {"mark":{"type":"rule","color":"#ffffff22","strokeDash":[4,4],"size":1},"encoding":{"x":{"datum":40}}},{"mark":{"type":"text","color":"#ffffff66","fontSize":9,"angle":0,"dy":-95,"dx":3,"align":"left","font":"Source Sans 3"},"encoding":{"x":{"datum":40},"text":{"value":"40\u00b0C extreme heat"}}},{"mark":{"type":"text","color":"#d44000","fontSize":9.5,"fontWeight":"bold","dx":7,"align":"left","font":"Source Sans 3"},"transform":[{"filter":"datum.d==='2020s' && datum.t>47"}],"encoding":{"x":{"field":"t","type":"quantitative"},"y":{"field":"d","type":"ordinal","sort":["1970s","1990s","2010s","2020s"]},"text":{"value":"47.6\u00b0C record"}}}
+    {"mark":{"type":"rule","color":"#ffffff22","strokeDash":[4,4],"size":1},"encoding":{"x":{"datum":40}}},{"mark":{"type":"text","color":"#ffffff66","fontSize":9,"angle":0,"dy":-95,"dx":3,"align":"left","font":"Source Sans 3"},"encoding":{"x":{"datum":40},"text":{"value":"40\u00b0C extreme heat"}}},{"mark":{"type":"text","color":"#d44000","fontSize":9.5,"fontWeight":"bold","dx":7,"align":"left","font":"Source Sans 3"},"transform":[{"filter":"datum.d==='2020s' && datum.t===47.6"}],"encoding":{"x":{"field":"t","type":"quantitative"},"y":{"field":"d","type":"ordinal","sort":["1970s","1990s","2010s","2020s"]},"text":{"value":"47.6\u00b0C record"}}}
   ]
 },{actions:false});
 
